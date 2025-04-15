@@ -238,7 +238,7 @@ def get_policies(config, params):
     params = build_params(params)
     if not config.get('resourceMap'):
         get_resource_url_map(config, params)
-    endpoint = "datapattern/list"
+    endpoint = "scan/policy/list"
     resource_map = config.get('resourceMap')
     user_id = resource_map[0]['roleId']
     all_data = []
@@ -255,6 +255,7 @@ def get_policies(config, params):
             all_data.extend(result)
         else:
             all_data.append(result)
+        break
     return {"policies": all_data}
 
 
