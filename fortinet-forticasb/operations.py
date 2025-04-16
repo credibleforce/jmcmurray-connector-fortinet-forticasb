@@ -259,6 +259,35 @@ def get_policies(config, params):
     return {"policies": all_data}
 
 
+def get_datapatterns(config, params):
+    """
+    Retrieves datapattern details across all business units.
+    """
+    fc = FortiCASBClient(config)
+    params = build_params(params)
+    if not config.get('resourceMap'):
+        get_resource_url_map(config, params)
+    endpoint = "datapattern/list"
+    resource_map = config.get('resourceMap')
+    user_id = resource_map[0]['roleId']
+    all_data = []
+    for bu in resource_map[0].get('buMapSet', []):
+        additional_headers = {
+            "companyId": str(bu.get('companyId')),
+            "roleId": str(user_id),
+            "buId": str(bu.get('buId')),
+            "timezone": params.get('timezone', "-0800")
+        }
+        result = fc.make_api_call(config=config, endpoint=endpoint, method='GET', data=None,
+                                  additional_headers=additional_headers)
+        if isinstance(result, list):
+            all_data.extend(result)
+        else:
+            all_data.append(result)
+        break
+    return {"datapatterns": all_data}
+
+
 def get_resource_url_map(config, params):
     """
     Retrieves the resource URL map and stores it in the config.
@@ -326,5 +355,6 @@ operations = {
     'get_file_summary': get_file_summary,
     'search_activity': search_activity,
     'get_policies': get_policies,
+    'get_datapatterns': get_datapatterns,
     'check_health': check_health
 }
